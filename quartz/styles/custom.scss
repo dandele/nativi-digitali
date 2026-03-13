@@ -1,3 +1,489 @@
 @use "./base.scss";
 
-// put your custom CSS here!
+// ═══════════════════════════════════════════════════════════════
+// NATIVI DIGITALI — Design System
+// Ispirazione: profgalloway.com (editoriale) + theneuron.ai (raffinato)
+// ═══════════════════════════════════════════════════════════════
+
+// ─────────────────────────────────────────
+// TIPOGRAFIA EDITORIALE
+// ─────────────────────────────────────────
+
+// Titolo della pagina (sidebar) — più carattere
+h2.page-title a {
+  font-family: var(--headerFont);
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--dark);
+  text-decoration: none;
+
+  &:hover { color: var(--secondary); }
+}
+
+// Titolo articolo — serif grande, editoriale
+h1.article-title {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 400;           // DM Serif Display è già bold per design
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--dark);
+  margin-bottom: 0.4em;
+}
+
+// Headings nel corpo articolo
+article {
+  h1 { font-size: 2rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.02em; }
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin-top: 2.5em;
+    padding-top: 0.5em;
+    border-top: 2px solid var(--lightgray);
+  }
+  h3 { font-size: 1.1rem; font-weight: 700; font-family: var(--bodyFont); margin-top: 2em; }
+
+  // Corpo testo — leggibile, generoso
+  p {
+    font-size: 1.05rem;
+    line-height: 1.78;
+    color: var(--darkgray);
+  }
+
+  // Link inline — sottolineatura discreta, accento al hover
+  a {
+    color: var(--dark);
+    text-decoration: underline;
+    text-decoration-color: var(--lightgray);
+    text-underline-offset: 3px;
+    transition: color 0.15s, text-decoration-color 0.15s;
+
+    &:hover {
+      color: var(--secondary);
+      text-decoration-color: var(--secondary);
+    }
+  }
+
+  // Blockquote — editoriale, con barra rossa
+  blockquote {
+    border-left: 3px solid var(--secondary);
+    margin: 2em 0;
+    padding: 0.5em 1.5em;
+    background: var(--highlight);
+    border-radius: 0 4px 4px 0;
+
+    p {
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--darkgray);
+    }
+  }
+
+  // Separatori — eleganti
+  hr {
+    border: none;
+    border-top: 2px solid var(--lightgray);
+    margin: 3em 0;
+  }
+
+  // Strong — usa l'accento
+  strong { color: var(--dark); font-weight: 700; }
+}
+
+// ─────────────────────────────────────────
+// LAYOUT GLOBALE
+// ─────────────────────────────────────────
+
+// Sidebar sinistra — più pulita
+.left.sidebar {
+  border-right: 1px solid var(--lightgray);
+  padding-right: 1.5rem;
+}
+
+// ContentMeta (data, tempo lettura) — sobrio
+.content-meta {
+  font-size: 0.8rem;
+  font-family: var(--bodyFont);
+  color: var(--gray);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+}
+
+// Breadcrumbs — minimali
+.breadcrumb-container {
+  font-size: 0.78rem;
+  color: var(--gray);
+  margin-bottom: 0.5rem;
+
+  a { color: var(--gray); &:hover { color: var(--secondary); } }
+}
+
+// Tags — pill con accento
+.tags li a {
+  border: 1px solid var(--lightgray);
+  border-radius: 9999px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-family: var(--bodyFont);
+  color: var(--darkgray);
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: var(--secondary);
+    color: var(--secondary);
+    background: var(--highlight);
+  }
+}
+
+// ─────────────────────────────────────────
+// RICERCA — stile Neuron
+// ─────────────────────────────────────────
+
+.search-button {
+  border-radius: 6px;
+  border: 1px solid var(--lightgray);
+  transition: border-color 0.15s;
+
+  &:hover { border-color: var(--gray); }
+}
+
+// ─────────────────────────────────────────
+// GRAFO — dot più elegante
+// ─────────────────────────────────────────
+
+.graph > h3 {
+  font-size: 0.72rem;
+  font-family: var(--bodyFont);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 0.75rem;
+}
+
+// ─────────────────────────────────────────
+// FOOTER
+// ─────────────────────────────────────────
+
+footer {
+  border-top: 1px solid var(--lightgray);
+  padding-top: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--gray);
+
+  a { color: var(--gray); &:hover { color: var(--secondary); } }
+}
+
+// ─────────────────────────────────────────
+// STACKED PANELS — Andy Matuschak style
+// ─────────────────────────────────────────
+
+#panel-stack-root {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  max-width: calc(100vw - 200px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  pointer-events: none;
+  z-index: 200;
+  gap: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--lightgray) transparent;
+}
+
+.stacked-panel {
+  flex-shrink: 0;
+  width: 560px;
+  min-width: 320px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  background: var(--light);
+  border-left: 1px solid var(--lightgray);
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
+
+  transform: translateX(30px);
+  opacity: 0;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity   0.22s ease;
+  pointer-events: all;
+
+  &.panel-visible { transform: translateX(0); opacity: 1; }
+
+  &.panel-loading .panel-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+  }
+
+  &.panel-flash { animation: panel-flash 0.45s ease; }
+}
+
+@keyframes panel-flash {
+  0%, 100% { background: var(--light); }
+  50% { background: var(--highlight); }
+}
+
+.panel-header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: var(--light);
+  border-bottom: 1px solid var(--lightgray);
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+.panel-close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--lightgray);
+  background: transparent;
+  color: var(--gray);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  line-height: 1;
+
+  &:hover {
+    border-color: var(--secondary);
+    background: var(--secondary);
+    color: white;
+  }
+}
+
+.panel-title {
+  font-family: var(--headerFont);
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--dark);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover { color: var(--secondary); }
+}
+
+.panel-loading-title { font-size: 0.85rem; color: var(--gray); }
+
+.panel-body {
+  padding: 28px 28px 80px;
+  font-size: 1rem;
+  line-height: 1.75;
+
+  h1 {
+    font-family: var(--headerFont);
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+  h2 { font-family: var(--headerFont); font-size: 1.2rem; font-weight: 400; margin-top: 2em; }
+  h3 { font-size: 1rem; font-weight: 700; font-family: var(--bodyFont); }
+
+  p { line-height: 1.75; color: var(--darkgray); }
+
+  a {
+    color: var(--dark);
+    text-decoration: underline;
+    text-decoration-color: var(--lightgray);
+    text-underline-offset: 3px;
+    &:hover { color: var(--secondary); text-decoration-color: var(--secondary); }
+  }
+
+  // Nascondi elementi di navigazione delle pagine fetched
+  .left.sidebar, .right.sidebar, nav, footer,
+  .toc, .backlinks, .graph, .breadcrumb-container,
+  .tags, .content-meta { display: none !important; }
+}
+
+.panel-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--lightgray);
+  border-top-color: var(--secondary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.panel-error { color: var(--gray); font-style: italic; }
+
+// ─────────────────────────────────────────
+// BROKEN / UNPUBLISHED LINKS
+// ─────────────────────────────────────────
+
+// Links pointing to pages not yet published — styled as plain text
+a.nd-broken,
+a.nd-broken:hover {
+  color: var(--darkgray) !important;
+  text-decoration: none !important;
+  cursor: default !important;
+  pointer-events: none !important;
+  opacity: 0.45;
+}
+
+// ─────────────────────────────────────────
+// KANBAN BOARD
+// ─────────────────────────────────────────
+
+.kanban-board { width: 100%; }
+
+.kanban-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.25rem;
+  }
+}
+
+.kanban-subtitle {
+  color: var(--gray);
+  font-size: 0.82rem;
+  margin: 0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: var(--bodyFont);
+}
+
+.kanban-columns {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--lightgray) transparent;
+}
+
+.kanban-column {
+  flex: 0 0 210px;
+  min-width: 190px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-top: 3px solid var(--lightgray);
+  border-radius: 6px;
+  padding: 14px;
+  transition: border-top-color 0.2s;
+
+  &:hover { border-top-color: var(--secondary); }
+
+  &[data-status="Raw"]      { border-top-color: #a8c5a0; }
+  &[data-status="Seedling"] { border-top-color: #7db87d; }
+  &[data-status="Budding"]  { border-top-color: var(--tertiary); }
+  &[data-status="Evergreen"]{ border-top-color: #4a9450; }
+}
+
+.kanban-column-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.kanban-emoji { font-size: 1rem; }
+
+.kanban-column-title {
+  font-family: var(--bodyFont);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dark);
+  flex: 1;
+}
+
+.kanban-count {
+  background: var(--lightgray);
+  color: var(--darkgray);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  font-family: var(--bodyFont);
+}
+
+.kanban-column-desc {
+  font-size: 0.73rem;
+  color: var(--gray);
+  margin: 0 0 12px;
+  line-height: 1.4;
+  font-family: var(--bodyFont);
+}
+
+.kanban-cards { display: flex; flex-direction: column; gap: 6px; }
+
+.kanban-card {
+  display: block;
+  background: var(--lightgray);
+  border-radius: 4px;
+  padding: 9px 11px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+
+  &:hover {
+    background: var(--highlight);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    text-decoration: none;
+  }
+}
+
+.kanban-card-title {
+  font-family: var(--bodyFont);
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--dark);
+  display: block;
+  line-height: 1.4;
+}
+
+.kanban-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.kanban-tag {
+  font-size: 0.65rem;
+  background: var(--light);
+  color: var(--gray);
+  padding: 1px 6px;
+  border-radius: 9999px;
+  font-family: var(--bodyFont);
+}
+
+.kanban-empty {
+  font-size: 0.78rem;
+  color: var(--gray);
+  font-style: italic;
+  text-align: center;
+  padding: 16px 0;
+}

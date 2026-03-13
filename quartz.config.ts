@@ -8,47 +8,47 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "Quartz 4",
-    pageTitleSuffix: "",
+    pageTitle: "Nativi Digitali",
+    pageTitleSuffix: " · Nativi Digitali",
     enableSPA: true,
     enablePopovers: true,
     analytics: {
       provider: "plausible",
     },
-    locale: "en-US",
-    baseUrl: "quartz.jzhao.xyz",
-    ignorePatterns: ["private", "templates", ".obsidian"],
+    locale: "it-IT",
+    baseUrl: "localhost:8080",
+    ignorePatterns: ["private", "templates", ".obsidian", "_private", "Readwise"],
     defaultDateType: "modified",
     theme: {
       fontOrigin: "googleFonts",
       cdnCaching: true,
       typography: {
-        header: "Schibsted Grotesk",
-        body: "Source Sans Pro",
+        header: "DM Serif Display",   // Editoriale, forte — ispirato a Galloway
+        body: "DM Sans",              // Moderno, pulito — ispirato a The Neuron
         code: "IBM Plex Mono",
       },
       colors: {
         lightMode: {
-          light: "#faf8f8",
-          lightgray: "#e5e5e5",
-          gray: "#b8b8b8",
-          darkgray: "#4e4e4e",
-          dark: "#2b2b2b",
-          secondary: "#284b63",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
-          textHighlight: "#fff23688",
+          light: "#f8f6f1",           // Off-white caldo
+          lightgray: "#e8e2d9",       // Grigio caldo
+          gray: "#9e9488",            // Grigio medio caldo
+          darkgray: "#3d3830",        // Grigio scuro caldo
+          dark: "#1a1612",            // Near-black caldo
+          secondary: "#c8392d",       // Rosso editoriale — Galloway
+          tertiary: "#e8734a",        // Arancio bruciato — The Neuron
+          highlight: "rgba(200, 57, 45, 0.07)",
+          textHighlight: "#fde68a88",
         },
         darkMode: {
-          light: "#161618",
-          lightgray: "#393639",
-          gray: "#646464",
-          darkgray: "#d4d4d4",
-          dark: "#ebebec",
-          secondary: "#7b97aa",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
-          textHighlight: "#b3aa0288",
+          light: "#1a1e0f",           // Olive scuro — The Neuron dark
+          lightgray: "#2d3318",       // Olive più chiaro
+          gray: "#6b7250",            // Olive medio
+          darkgray: "#c8c4ae",        // Testo secondario caldo
+          dark: "#f0ece0",            // Testo principale warm white
+          secondary: "#e8574b",       // Rosso più luminoso per dark mode
+          tertiary: "#f0874d",        // Arancio più luminoso per dark mode
+          highlight: "rgba(232, 87, 75, 0.12)",
+          textHighlight: "#4a3d0088",
         },
       },
     },
