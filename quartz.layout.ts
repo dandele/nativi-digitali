@@ -13,9 +13,7 @@ export const sharedPageComponents: SharedLayout = {
     }),
   ],
   afterBody: [Component.StackedPanels()],
-  footer: Component.Footer({
-    links: { "Nativi Digitali": "/" },
-  }),
+  footer: Component.Footer({ links: { "Nativi Digitali": "/" } }),
 }
 
 export const defaultContentPageLayout: PageLayout = {
@@ -29,27 +27,14 @@ export const defaultContentPageLayout: PageLayout = {
     Component.TagList(),
     Component.Kanban(),
   ],
-  left: [
-    Component.DesktopOnly(Component.Explorer({
-      title: "",
-      folderDefaultState: "open",
-      folderClickBehavior: "link",
-    })),
-  ],
+  left: [],
   right: [
     Component.DesktopOnly(Component.TableOfContents()),
-    Component.Backlinks(),
   ],
 }
 
 export const defaultListPageLayout: PageLayout = {
   beforeBody: [Component.Breadcrumbs(), Component.ArticleTitle(), Component.ContentMeta()],
-  left: [
-    Component.DesktopOnly(Component.Explorer({
-      title: "",
-      folderDefaultState: "open",
-      folderClickBehavior: "link",
-    })),
-  ],
+  left: [],
   right: [],
 }
