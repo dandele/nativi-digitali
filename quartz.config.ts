@@ -16,7 +16,7 @@ const config: QuartzConfig = {
       provider: "plausible",
     },
     locale: "it-IT",
-    baseUrl: "localhost:8080",
+    baseUrl: "dandele.github.io/nativi-digitali",
     ignorePatterns: ["private", "templates", ".obsidian", "_private", "Readwise"],
     defaultDateType: "modified",
     theme: {
