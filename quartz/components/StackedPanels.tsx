@@ -6,71 +6,79 @@ StackedPanels.afterDOMLoaded = `
 (function () {
   'use strict';
 
-  // ── State ──────────────────────────────────────────────────────────────
-  let openPanels   = [];
-  let validSlugs   = null;   // Set<string> — populated from contentIndex.json
-  let indexReady   = false;
+  let openPanels = [];
+  let validSlugs = null;
+  let indexReady = false;
 
-  // ── Content index ──────────────────────────────────────────────────────
-  // Quartz already fetches this; we piggyback on it.
+  // Handles GitHub Pages subdirectory (e.g. /nativi-digitali/)
+  function getBasePath() {
+    const baseEl = document.querySelector('base');
+    if (!baseEl) return '/';
+    try { return new URL(baseEl.href).pathname; } catch { return '/'; }
+  }
+
   async function loadIndex() {
     if (indexReady) return;
     try {
       const base = document.querySelector('base')?.href ?? window.location.origin + '/';
       const res  = await fetch(new URL('static/contentIndex.json', base));
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       validSlugs = new Set(Object.keys(data));
-    } catch {
-      validSlugs = new Set(); // fail-open: treat all links as valid
+      indexReady = true;
+      markBrokenLinks(document.body);
+      bindLinks(document.body, null);
+    } catch (e) {
+      console.warn('[StackedPanels] contentIndex unavailable, retrying:', e);
+      setTimeout(loadIndex, 4000);
     }
-    indexReady = true;
-    markBrokenLinks(document.body);
   }
 
-  // ── Slug extraction ────────────────────────────────────────────────────
   function hrefToSlug(href) {
     try {
-      const url  = new URL(href, window.location.origin);
-      const path = decodeURIComponent(url.pathname);
-      return path.replace(/^\\//, '').replace(/\\/$/, '').replace(/\\.html$/, '') || 'index';
+      const url      = new URL(href, window.location.origin);
+      const basePath = getBasePath();
+      let path       = decodeURIComponent(url.pathname);
+      if (basePath !== '/' && path.startsWith(basePath)) {
+        path = path.slice(basePath.length);
+      } else {
+        path = path.replace(/^\\//, '');
+      }
+      return path.replace(/\\/$/, '').replace(/\\.html$/, '') || 'index';
     } catch { return null; }
   }
 
   function isPublished(href) {
-    if (!indexReady || !validSlugs) return true; // assume valid until index loads
+    if (!indexReady || !validSlugs) return true;
     const slug = hrefToSlug(href);
     return slug !== null && validSlugs.has(slug);
   }
 
-  // ── Link classification ────────────────────────────────────────────────
   function isInternalLink(el) {
     try {
       if (!el.href || el.tagName !== 'A') return false;
       const url = new URL(el.href, window.location.origin);
-      if (url.origin !== window.location.origin) return false; // external
-      if (url.hash && url.pathname === window.location.pathname) return false; // same-page anchor
+      if (url.origin !== window.location.origin) return false;
+      if (url.hash && url.pathname === window.location.pathname) return false;
       if (/\\.(png|jpe?g|gif|svg|pdf|mp4|webm|mp3|zip|css|js)$/i.test(url.pathname)) return false;
       if (el.target === '_blank') return false;
       if (el.dataset.noPopover === 'true') return false;
-      // Skip anchor-only heading links (Quartz adds these)
       if (el.getAttribute('href')?.startsWith('#')) return false;
       return true;
     } catch { return false; }
   }
 
-  // ── Broken links ───────────────────────────────────────────────────────
   function markBrokenLinks(root) {
     if (!indexReady) return;
-    root.querySelectorAll('a.internal[href], a[href]').forEach(link => {
+    root.querySelectorAll('a[href]').forEach(link => {
       if (!isInternalLink(link)) return;
       if (!isPublished(link.href)) {
         link.classList.add('nd-broken');
-        link.dataset.panelBound = 'skip'; // prevent panel binding
+        link.dataset.panelBound = 'skip';
       }
     });
   }
 
-  // ── Panel root ─────────────────────────────────────────────────────────
   function ensureRoot() {
     if (document.getElementById('panel-stack-root')) return;
     const root = document.createElement('div');
@@ -78,11 +86,8 @@ StackedPanels.afterDOMLoaded = `
     document.body.appendChild(root);
   }
 
-  // ── Open panel ─────────────────────────────────────────────────────────
   async function openPanel(href, parentPanel) {
     const path = hrefToSlug(href);
-
-    // Already open — flash it
     const dup = openPanels.find(p => p.path === path);
     if (dup) {
       dup.el.classList.add('panel-flash');
@@ -90,8 +95,6 @@ StackedPanels.afterDOMLoaded = `
       setTimeout(() => dup.el.classList.remove('panel-flash'), 600);
       return;
     }
-
-    // Close panels opened after the clicked parent
     if (parentPanel) {
       const idx = openPanels.findIndex(p => p === parentPanel);
       if (idx !== -1) {
@@ -99,69 +102,40 @@ StackedPanels.afterDOMLoaded = `
         openPanels = openPanels.slice(0, idx + 1);
       }
     }
-
-    // Placeholder panel
     const el = document.createElement('div');
     el.className = 'stacked-panel panel-loading';
-    el.innerHTML = \`
-      <div class="panel-header">
-        <button class="panel-close" aria-label="Chiudi">✕</button>
-        <span class="panel-loading-title">Caricamento…</span>
-      </div>
-      <div class="panel-body"><div class="panel-spinner"></div></div>
-    \`;
-
+    el.innerHTML = '<div class="panel-header"><button class="panel-close" aria-label="Chiudi">✕</button><span class="panel-loading-title">Caricamento…</span></div><div class="panel-body"><div class="panel-spinner"></div></div>';
     document.getElementById('panel-stack-root').appendChild(el);
-    void el.getBoundingClientRect(); // force reflow
+    void el.getBoundingClientRect();
     el.classList.add('panel-visible');
     el.scrollIntoView({ behavior: 'smooth', inline: 'end', block: 'nearest' });
-
     const panelData = { path, el };
     openPanels.push(panelData);
     el.querySelector('.panel-close').addEventListener('click', () => closeFrom(panelData));
-
-    // Fetch
     try {
       const res  = await fetch(href);
       const text = await res.text();
       const doc  = new DOMParser().parseFromString(text, 'text/html');
-
       const title = (
         doc.querySelector('h1.article-title')?.textContent?.trim() ||
         doc.querySelector('h1')?.textContent?.trim() ||
-        doc.title?.split('·')[0]?.trim() ||
-        'Nota'
+        doc.title?.split('·')[0]?.trim() || 'Nota'
       );
-
-      // Extract article body, strip nav cruft
       const article = doc.querySelector('article') || doc.querySelector('.center') || doc.body;
       ['.left.sidebar','.right.sidebar','nav','footer','.toc','.backlinks',
-       '.graph','.breadcrumb-container','.tags','.content-meta',
-       '#panel-stack-root'
+       '.graph','.breadcrumb-container','.tags','.content-meta','#panel-stack-root'
       ].forEach(sel => article.querySelectorAll(sel).forEach(n => n.remove()));
-
       el.classList.remove('panel-loading');
-      el.innerHTML = \`
-        <div class="panel-header">
-          <button class="panel-close" aria-label="Chiudi">✕</button>
-          <a href="\${href}" class="panel-title" title="\${title}">\${title}</a>
-        </div>
-        <div class="panel-body panel-content"></div>
-      \`;
+      el.innerHTML = '<div class="panel-header"><button class="panel-close" aria-label="Chiudi">✕</button><a href="' + href + '" class="panel-title" title="' + title + '">' + title + '</a></div><div class="panel-body panel-content"></div>';
       el.querySelector('.panel-content').appendChild(article);
       el.querySelector('.panel-close').addEventListener('click', () => closeFrom(panelData));
-
-      // Mark broken links inside the fetched content, then wire valid ones
       markBrokenLinks(el);
       bindLinks(el, panelData);
-
     } catch {
-      el.querySelector('.panel-body').innerHTML =
-        '<p class="panel-error">Impossibile caricare la nota.</p>';
+      el.querySelector('.panel-body').innerHTML = '<p class="panel-error">Impossibile caricare la nota.</p>';
     }
   }
 
-  // ── Close ──────────────────────────────────────────────────────────────
   function animateClose(panelData) {
     panelData.el.classList.remove('panel-visible');
     setTimeout(() => panelData.el.remove(), 300);
@@ -174,8 +148,6 @@ StackedPanels.afterDOMLoaded = `
     openPanels = openPanels.slice(0, idx);
   }
 
-  // ── Wire links ─────────────────────────────────────────────────────────
-  // capture: true → runs before Quartz's SPA router
   function bindLink(link, parentPanel) {
     if (link.dataset.panelBound) return;
     link.dataset.panelBound = 'true';
@@ -190,7 +162,7 @@ StackedPanels.afterDOMLoaded = `
   function bindLinks(scope, parentPanel) {
     scope.querySelectorAll('a[href]').forEach(link => {
       if (!isInternalLink(link)) return;
-      if (link.dataset.panelBound) return; // already handled or marked broken/skip
+      if (link.dataset.panelBound) return;
       if (!isPublished(link.href)) {
         link.classList.add('nd-broken');
         link.dataset.panelBound = 'skip';
@@ -200,8 +172,6 @@ StackedPanels.afterDOMLoaded = `
     });
   }
 
-  // ── MutationObserver ───────────────────────────────────────────────────
-  // Catches dynamically added links (Quartz popovers, SPA content swaps, etc.)
   let mutationDebounce = null;
   const observer = new MutationObserver(() => {
     clearTimeout(mutationDebounce);
@@ -211,7 +181,6 @@ StackedPanels.afterDOMLoaded = `
     }, 60);
   });
 
-  // ── Init ───────────────────────────────────────────────────────────────
   function init() {
     ensureRoot();
     bindLinks(document.body, null);
@@ -224,11 +193,9 @@ StackedPanels.afterDOMLoaded = `
     loadIndex().then(init);
   });
 
-  // SPA nav: keep panels, re-wire new page links
   document.addEventListener('nav', () => {
     ensureRoot();
-    bindLinks(document.body, null);
-    if (indexReady) markBrokenLinks(document.body);
+    if (indexReady) { bindLinks(document.body, null); markBrokenLinks(document.body); }
   });
 })();
 `
